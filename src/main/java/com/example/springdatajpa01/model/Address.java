@@ -12,14 +12,23 @@ import lombok.NoArgsConstructor;
 public class Address {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String Street;
 
+    @Column(nullable = false)
+    private String state;
+
+    @Column(nullable = false)
     private String city;
 
-    @OneToOne
-    @JoinColumn(name = "users_id", referencedColumnName = "id")
-    private User user;
+    @Column(nullable = false)
+    private String country;
+
+    @Column(nullable = false)
+    private String zipCode;
+
+
 }
