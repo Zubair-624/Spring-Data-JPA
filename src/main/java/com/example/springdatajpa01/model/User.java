@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-
+@Builder
 @Entity
 @Table(name = "users")
 public class User {
@@ -30,7 +30,7 @@ public class User {
     private String userEmail;
 
     @NotBlank(message = "Phone number is required")
-    @Pattern(regexp = "^\\+?[0-9]\\d{1,14}", message = "Phone number must be exactly 15 digits")
+    @Pattern(regexp = "^\\+?[0-9]\\d{1,14}$", message = "Phone number must be exactly 15 digits")
     @Column(unique = true, nullable = false)
     private String userPhoneNumber;
 
