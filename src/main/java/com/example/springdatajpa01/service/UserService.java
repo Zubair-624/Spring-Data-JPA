@@ -76,6 +76,16 @@ public class UserService {
         return mapToDTO(user);
     }
 
+    @Transactional(readOnly = true)
+    public Page<UserDto> getAllUsers(int page, int size){
+        log.info("Fetching all users - Page: {}, Size: {}", page, size);
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<User> userPage = userRepository.findAll(pageable);
+
+        return userPage.map(this::mapToDTO);
+    }
+
     private UserDto mapToDTO(User user){
         return UserDto.builder()
                 .userId(user.getUserId())
