@@ -85,7 +85,7 @@ public class UserService {
 
     /**-------------------- Update Operation --------------------**/
     @Transactional
-    public UserDto updateUser(Long userId, UserDto userDto){
+    public UserDto updateUserByUserId(Long userId, UserDto userDto){
         log.info("Updating user with ID: {}", userId);
 
         User user = userRepository.findById(userId)
@@ -116,7 +116,7 @@ public class UserService {
 
     /**-------------------- Delete Operation --------------------**/
     @Transactional
-    public void deleteUser(Long userId){
+    public void deleteUserByUserId(Long userId){
         log.info("Deleting user with ID: {}", userId);
 
         User user = userRepository.findById(userId)
