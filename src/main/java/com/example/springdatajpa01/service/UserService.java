@@ -26,9 +26,7 @@ public class UserService {
 
     //-------------------- CRUD OPERATIONS --------------------//
 
-    /**
-     * -------------------- Create Operation --------------------
-     **/
+    /**-------------------- Create Operation --------------------**/
     @Transactional
     public UserDto createUser(UserDto userDto) {
         log.info("Creating user: {}", userDto.getUserEmail());
@@ -59,9 +57,7 @@ public class UserService {
         return mapToDTO(savedUser);
     }
 
-    /**
-     * -------------------- Read by ID Operation --------------------
-     **/
+    /**-------------------- Read by ID Operation --------------------**/
     @Transactional(readOnly = true)
     public UserDto getUserByUserId(Long userId) {
         log.info("Fetching user with ID: {}", userId);
@@ -76,6 +72,7 @@ public class UserService {
         return mapToDTO(user);
     }
 
+    /**-------------------- Read All Users With Pagination --------------------**/
     @Transactional(readOnly = true)
     public Page<UserDto> getAllUsers(int page, int size){
         log.info("Fetching all users - Page: {}, Size: {}", page, size);
@@ -85,6 +82,56 @@ public class UserService {
 
         return userPage.map(this::mapToDTO);
     }
+
+    /**-------------------- Update Operation --------------------**/
+    @Transactional
+    public UserDto updateUserByUserId(Long userId, UserDto userDto){
+        log.info("Updating user with ID: {}", userId);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    log.error("User with ID: {} not found for update", userId);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+                });
+
+        if(user.getAddress() == null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Address is missing");
+        }
+
+        user.setUserName(userDto.getUserName());
+        user.setUserEmail(userDto.getUserEmail());
+        user.setUserPhoneNumber(userDto.getUserPhoneNumber());
+
+        user.getAddress().setStreet(userDto.getStreet());
+        user.getAddress().setState(userDto.getState());
+        user.getAddress().setCity(userDto.getCity());
+        user.getAddress().setCountry(userDto.getCountry());
+        user.getAddress().setZipCode(userDto.getZipCode());
+
+        User saveTheUpdatedUser = userRepository.save(user);
+        log.info("User with ID: {} updated successfully", userId);
+
+        return mapToDTO(saveTheUpdatedUser);
+    }
+
+    /**-------------------- Delete Operation --------------------**/
+    @Transactional
+    public void deleteUserByUserId(Long userId){
+        log.info("Deleting user with ID: {}", userId);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    log.error("User with ID: {} not found for deleting", userId);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found");
+                });
+
+        userRepository.delete(user);
+        log.info("User with ID: {} deleted successfully", userId);
+    }
+
+
+
+    /**-------------------- Convert Entity to DTO --------------------**/
 
     private UserDto mapToDTO(User user){
         return UserDto.builder()
