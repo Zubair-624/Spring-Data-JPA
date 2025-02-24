@@ -11,9 +11,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -118,5 +123,21 @@ public class UserServiceTest {
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
         assertEquals("User not found", exception.getReason());
+    }
+
+    /** -------------------- Test: Get All Users -------------------- **/
+
+    @Test
+    void shouldReturnAllUsers(){
+        List<User> userList = Collections.singletonList(user);
+        Page<User> userPage = new PageImpl<>(userList);
+
+        when(userRepository.findAll(any(PageRequest.class))).thenReturn(userPage);
+
+        Page<UserDto> allUserResult = userService.getAllUsers(0, 10);
+
+        assertFalse(allUserResult.isEmpty());
+        assertEquals(1, allUserResult.getTotalElements());
+        verify(userRepository, times(1)).findAll(any(PageRequest.class));
     }
 }
