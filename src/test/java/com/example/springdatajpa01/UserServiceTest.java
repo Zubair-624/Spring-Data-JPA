@@ -14,6 +14,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -72,6 +74,7 @@ public class UserServiceTest {
 
         assertNotNull(createdUser);
         assertEquals(userDto.getUserEmail(), createdUser.getUserEmail());
+
         verify(userRepository, times(1)).save(any(User.class));
 
     }
@@ -89,5 +92,31 @@ public class UserServiceTest {
         assertEquals("Email already exists", exception.getReason());
 
 
+    }
+
+    /** -------------------- Test: Get User By ID -------------------- **/
+
+    @Test
+    void shouldReturnUserByUserId(){
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+        UserDto foundUser = userService.getUserByUserId(1L);
+
+        assertNotNull(foundUser);
+        assertEquals(user.getUserId(), foundUser.getUserId());
+
+        verify(userRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUserNotFoundByUserId(){
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+            userService.getUserByUserId(1L);
+        });
+
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        assertEquals("User not found", exception.getReason());
     }
 }
