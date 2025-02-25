@@ -140,4 +140,55 @@ public class UserServiceTest {
         assertEquals(1, allUserResult.getTotalElements());
         verify(userRepository, times(1)).findAll(any(PageRequest.class));
     }
+
+    /** -------------------- Test: Update User -------------------- **/
+
+    @Test
+    void shouldUpdateUserSuccessfully(){
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenReturn(user);
+
+        UserDto updatedUser = userService.updateUserByUserId(1L, userDto);
+
+        assertNotNull(updatedUser);
+        assertEquals(user.getUserId(), updatedUser.getUserId());
+        verify(userRepository, times(1)).save(any(User.class));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUpdatingUserNotExist(){
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+            userService.updateUserByUserId(1L, userDto);
+        });
+
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        assertEquals("User not found", exception.getReason());
+    }
+
+    /** -------------------- Test: Delete User -------------------- **/
+
+    @Test
+    void shouldDeleteUserSuccessfully(){
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+        userService.deleteUserByUserId(1L);
+
+        verify(userRepository, times(1)).delete(user);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenDeletingUserNotExist(){
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+            userService.deleteUserByUserId(1L);
+        });
+
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        assertEquals("User not found", exception.getReason());
+    }
+
+
 }
